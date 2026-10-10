@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Flash Frame: The One-Second Challenge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EEF2FB; --ink:#101828; --ink2:#475467; --line:#C5CFE8;
+  --blue:#2747E8; --blue-d:#1B34B8; --blue-l:#E1E8FF;
+  --sun:#FFC83D; --good:#14946A; --good-d:#0B5E43; --good-l:#DDF5EA;
+  --soft:#F2A33A; --soft-d:#9A5B07; --soft-l:#FFF0D6;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%;margin:0}
+body{
+  font-family:'Fredoka','Trebuchet MS','Arial Rounded MT Bold',system-ui,sans-serif;
+  background:var(--bg); color:var(--ink);
+  font-size:clamp(16px,2.1vh,24px); line-height:1.25;
+  -webkit-tap-highlight-color:transparent; -webkit-user-select:none; user-select:none;
+}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:5px solid var(--blue);outline-offset:3px}
+h1,h2,h3,p{margin:0}
+#app{height:100%;position:relative}
+.screen{height:100%;display:flex;flex-direction:column}
+
+/* ---------- buttons ---------- */
+.btn{
+  border:4px solid var(--ink);background:#fff;border-radius:22px;
+  padding:.55em 1.3em;font-weight:600;font-size:1.15em;min-height:56px;
+  box-shadow:0 6px 0 var(--ink);transition:transform .08s,box-shadow .08s,background .12s;
+}
+.btn:hover{background:var(--blue-l)}
+.btn:active{transform:translateY(5px);box-shadow:0 1px 0 var(--ink)}
+.btn.primary{background:var(--blue);color:#fff;border-color:var(--ink)}
+.btn.primary:hover{background:var(--blue-d)}
+.btn.ghost{box-shadow:none;border-width:3px;border-color:var(--line);background:transparent;font-weight:500}
+.btn.ghost:hover{background:#fff;border-color:var(--ink)}
+.btn.ghost:active{transform:none}
+.btn.small{font-size:1em;min-height:48px;padding:.4em 1em;box-shadow:0 4px 0 var(--ink)}
+.btn.small.ghost{box-shadow:none}
+
+/* ---------- frame ---------- */
+svg.frame{display:block;width:100%;height:auto}
+.hero-frame{width:min(88vw,150vh)}
+.hero circle{transform-box:fill-box;transform-origin:center;animation:pop .55s cubic-bezier(.3,1.6,.5,1) both;animation-delay:calc(var(--i)*.3s + .35s)}
+@keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
+
+/* ---------- welcome ---------- */
+#screen-welcome{align-items:center;justify-content:center;gap:3.2vh;text-align:center;padding:3vh 4vw}
+.wordmark{font-size:clamp(52px,13vh,170px);font-weight:700;letter-spacing:-.02em;line-height:.95}
+.wordmark .bolt{color:var(--sun);-webkit-text-stroke:3px var(--ink);margin-left:.1em}
+.subtitle{font-size:clamp(20px,4vh,48px);font-weight:500;color:var(--blue-d)}
+.tagline{font-size:clamp(18px,3.2vh,38px);color:var(--ink2)}
+.start-btn{font-size:clamp(26px,5vh,60px);padding:.4em 1.6em;border-radius:30px}
+.setup-line{font-size:clamp(14px,2vh,22px);color:var(--ink2)}
+.corner{position:absolute;right:max(2.2vw,12px);bottom:max(2.5vh,12px)}
+
+/* ---------- rules ---------- */
+#screen-rules{align-items:center;justify-content:center;gap:4vh;padding:3vh 5vw;text-align:center}
+#screen-rules h2{font-size:clamp(34px,7vh,84px);font-weight:700}
+.steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:2vw;width:min(96vw,1700px);counter-reset:s}
+.steps li{
+  background:#fff;border:4px solid var(--ink);border-radius:26px;padding:2.4vh 1.4vw;
+  font-size:clamp(18px,3.2vh,40px);font-weight:500;counter-increment:s;
+  display:flex;flex-direction:column;align-items:center;gap:1.4vh;box-shadow:0 8px 0 var(--ink);
+}
+.steps li::before{
+  content:counter(s);width:2.1em;height:2.1em;border-radius:50%;background:var(--blue);color:#fff;
+  display:grid;place-items:center;font-weight:700;font-size:1.1em;
+}
+.row{display:flex;flex-wrap:wrap;gap:2vw;justify-content:center;align-items:center}
+
+/* ---------- game ---------- */
+#screen-game{padding:0 0 1vh}
+.hud{display:grid;grid-template-columns:auto 1fr auto auto;align-items:center;gap:2vw;padding:1.6vh 2.4vw 1vh}
+.brand{font-size:clamp(22px,4vh,46px);font-weight:700;letter-spacing:-.01em}
+.roundbox{justify-self:center;width:min(100%,46vw);text-align:center}
+.roundtext{font-size:clamp(20px,3.6vh,42px);font-weight:600}
+.bar{height:clamp(10px,1.6vh,18px);background:#fff;border:3px solid var(--ink);border-radius:99px;margin-top:.6vh;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--blue);transition:width .35s}
+.stats{display:flex;gap:1.2vw}
+.stat{background:#fff;border:3px solid var(--ink);border-radius:20px;padding:.25em .9em;min-width:6.4em;text-align:center}
+.stat small{display:block;font-size:.62em;color:var(--ink2);font-weight:500}
+.stat b{display:block;font-size:1.7em;font-weight:700;line-height:1.05}
+.stat.bump b{animation:bump .45s ease}
+@keyframes bump{40%{transform:scale(1.25);color:var(--blue)}}
+.teams{display:flex;gap:1vw;justify-content:center;padding:0 2.4vw;flex-wrap:wrap}
+.team{border:3px solid var(--line);border-radius:99px;padding:.2em .9em;background:transparent;font-weight:500;color:var(--ink2)}
+.team.on{background:var(--blue);border-color:var(--ink);color:#fff}
+.play{flex:1;min-height:0;display:flex;flex-direction:column}
+.stage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:1vh 3vw}
+.frame-wrap{width:min(94%,150vh)}
+.ready{display:grid;place-items:center}
+.ring{width:clamp(90px,24vh,260px);aspect-ratio:1;border-radius:50%;border:clamp(10px,2.4vh,26px) solid var(--sun);
+  animation:ring var(--ready,900ms) linear forwards}
+@keyframes ring{from{transform:scale(1);opacity:1}to{transform:scale(.3);opacity:.4}}
+.qmark{font-size:clamp(120px,34vh,380px);font-weight:700;color:var(--blue);line-height:1}
+.locked{font-size:clamp(90px,24vh,260px);line-height:1}
+.reveal{display:flex;flex-direction:column;align-items:center}
+.bignum{font-size:clamp(120px,32vh,360px);font-weight:700;line-height:.95}
+.unit{font-size:clamp(24px,5vh,60px);font-weight:500;color:var(--ink2)}
+.msg{min-height:clamp(70px,12vh,150px);text-align:center;padding:0 3vw;display:flex;flex-direction:column;justify-content:center;gap:.5vh}
+.msg-main{font-size:clamp(26px,5.4vh,64px);font-weight:700;letter-spacing:-.01em}
+.msg-sub{font-size:clamp(17px,2.9vh,34px);color:var(--ink2)}
+.chips{display:flex;gap:1vw;justify-content:center;margin-top:.4vh}
+.chip{background:var(--blue);color:#fff;border-radius:99px;padding:.1em .8em;font-weight:600;font-size:clamp(16px,2.8vh,32px)}
+.chip.sun{background:var(--sun);color:var(--ink)}
+.actions{min-height:clamp(64px,10vh,120px);display:flex;gap:2vw;justify-content:center;align-items:center;flex-wrap:wrap;padding:.8vh 3vw 3vh}
+.answers{display:grid;grid-template-columns:repeat(5,1fr);gap:2.4vw;padding:0 3vw 3vh}
+.ans{
+  height:clamp(84px,19vh,210px);font-size:clamp(46px,12vh,130px);font-weight:600;
+  background:#fff;border:5px solid var(--ink);border-radius:30px;box-shadow:0 9px 0 var(--ink);
+  transition:transform .08s,box-shadow .08s,background .12s;
+}
+.ans:hover:not(:disabled){background:var(--blue-l)}
+.ans:active:not(:disabled){transform:translateY(7px);box-shadow:0 2px 0 var(--ink)}
+.ans:disabled{cursor:default}
+.ans.picked{background:var(--blue);color:#fff}
+.ans.good{background:var(--good);color:#fff;border-color:var(--good-d);box-shadow:0 9px 0 var(--good-d)}
+.ans.gentle{background:var(--soft-l);color:var(--soft-d);border-color:var(--soft);box-shadow:0 9px 0 var(--soft)}
+.ans.dim{opacity:.4}
+.is-paused .frame-wrap{visibility:hidden}
+.is-paused .ring{animation-play-state:paused}
+
+/* ---------- two-team race ---------- */
+.arena{flex:1;min-height:0;display:flex;gap:1.4vw;padding:0 2vw}
+.play{min-width:0}
+.pad{--tc:var(--blue);width:21vw;flex:none;display:flex;flex-direction:column;gap:1vh;padding-bottom:2vh}
+.pad.t1{--tc:#0E8A8A}
+.pad.t2{--tc:#7A3FD1}
+.pad-head{background:var(--tc);color:#fff;border:4px solid var(--ink);border-radius:22px;padding:.5vh 1vw;display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:clamp(20px,3.6vh,42px)}
+.pad-score{font-size:1.4em;background:#fff;color:var(--ink);border-radius:14px;min-width:1.6em;text-align:center;padding:0 .3em;line-height:1.2}
+.pad-status{font-size:clamp(14px,2.3vh,28px);text-align:center;color:var(--ink2);min-height:1.3em;font-weight:500}
+.pad.won .pad-head{box-shadow:0 0 0 8px var(--good)}
+.pad.won .pad-status{color:var(--good-d);font-weight:700}
+.pad-keys{flex:1;min-height:0;display:flex;flex-direction:column;gap:clamp(12px,2vh,24px);padding-bottom:6px}
+.tkey{
+  flex:1;min-height:0;position:relative;background:#fff;border:5px solid var(--tc);border-radius:24px;
+  font-size:clamp(34px,8.4vh,100px);font-weight:600;box-shadow:0 6px 0 var(--tc);
+  transition:transform .06s,box-shadow .06s,background .12s;touch-action:manipulation;
+}
+.tkey small{position:absolute;right:.7em;bottom:.35em;font-size:.26em;color:var(--ink2);font-weight:500}
+.tkey:hover:not(:disabled){background:var(--blue-l)}
+.tkey:active:not(:disabled){transform:translateY(5px);box-shadow:0 1px 0 var(--tc)}
+.tkey:disabled{cursor:default;opacity:.55}
+.tkey.good{opacity:1;background:var(--good);color:#fff;border-color:var(--good-d);box-shadow:0 6px 0 var(--good-d)}
+.tkey.good small{color:#D6F5E8}
+.tkey.gentle{opacity:1;background:var(--soft-l);color:var(--soft-d);border-color:var(--soft);box-shadow:0 6px 0 var(--soft)}
+.pad.locked .tkey{opacity:.35}
+/* three teams: frame on top, one keypad per team along the bottom (left, centre, right) */
+.teams3 .arena{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:minmax(0,1fr) auto;
+  grid-template-areas:"play play play" "p0 p1 p2";gap:1vh 2vw}
+.teams3 .play{grid-area:play}
+.teams3 #pad0{grid-area:p0}.teams3 #pad1{grid-area:p1}.teams3 #pad2{grid-area:p2}
+.teams3 .pad{width:auto;padding-bottom:2.4vh;gap:.8vh}
+.teams3 .pad-head{font-size:clamp(18px,3vh,36px);padding:.3vh 1vw}
+.teams3 .pad-status{font-size:clamp(13px,2vh,24px)}
+.teams3 .pad-keys{flex:none;flex-direction:row;height:clamp(70px,15vh,160px);gap:clamp(8px,1vw,20px);padding-bottom:6px}
+.teams3 .tkey{border-width:4px;border-radius:18px;font-size:clamp(28px,6.6vh,76px);min-width:0}
+.teams3 .tkey small{right:.5em;bottom:.2em}
+@media (max-aspect-ratio:1/1){
+  .arena{flex-direction:column;gap:1vh}
+  .pad{width:100%;padding-bottom:0}
+  .pad-keys{flex:none;flex-direction:row;height:11vh}
+  .pad-status{display:none}
+  .teams3 .arena{display:flex;flex-direction:column}
+  .teams3 .pad-keys{height:9vh}
+}
+
+/* ---------- overlay ---------- */
+.overlay{position:absolute;inset:0;background:var(--bg);z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4vh;text-align:center;padding:4vh 4vw}
+.overlay h2{font-size:clamp(40px,9vh,110px);font-weight:700}
+.overlay p{font-size:clamp(18px,3vh,34px);color:var(--ink2)}
+
+/* ---------- settings ---------- */
+#screen-settings{padding:0}
+.settings-head{padding:2.2vh 3vw 1vh}
+.settings-head h2{font-size:clamp(30px,5.4vh,64px);font-weight:700}
+.settings-head p{color:var(--ink2);margin-top:.4vh}
+.settings-body{flex:1;overflow:auto;padding:1vh 3vw 2vh;display:flex;flex-direction:column;gap:2vh;-webkit-user-select:none}
+.levels{display:grid;grid-template-columns:repeat(4,1fr);gap:1.2vw}
+.level{
+  text-align:left;background:#fff;border:4px solid var(--ink);border-radius:22px;padding:1.2vh 1.1vw;
+  display:flex;flex-direction:column;gap:.3vh;box-shadow:0 6px 0 var(--ink);
+}
+.level b{font-size:1.2em}
+.level span{font-size:.85em;color:var(--ink2)}
+.level[aria-pressed="true"]{background:var(--blue);color:#fff;border-color:var(--ink)}
+.level[aria-pressed="true"] span{color:#DCE4FF}
+.groups{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2vh 2vw;align-items:stretch}
+.group.wide{grid-column:1/-1}
+.items{display:grid;gap:2vh 2vw;align-content:start}
+.group.wide .items{grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr))}
+.group{background:#fff;border:3px solid var(--line);border-radius:24px;padding:2vh 1.6vw;display:flex;flex-direction:column;gap:2vh;min-width:0}
+.group h3{font-size:1.3em;font-weight:700}
+.setting label,.setting .lab{display:block;font-weight:600;margin-bottom:.4vh}
+.setting .hint{font-size:.82em;color:var(--ink2);margin-bottom:.8vh}
+.seg{display:flex;flex-wrap:wrap;gap:.6vw}
+.seg button{min-height:52px;padding:.35em 1em;border:3px solid var(--ink);background:#fff;border-radius:14px;font-weight:500}
+.seg button:hover{background:var(--blue-l)}
+.seg button[aria-pressed="true"]{background:var(--blue);color:#fff;border-color:var(--blue-d)}
+.settings-foot{display:flex;justify-content:space-between;gap:2vw;padding:1.4vh 3vw 2vh;border-top:3px solid var(--line);background:var(--bg)}
+
+/* ---------- results ---------- */
+#screen-results{align-items:center;overflow:auto;padding:3vh 4vw;gap:2.2vh;text-align:center}
+.trophy{font-size:clamp(50px,10vh,120px);line-height:1}
+#screen-results h1{font-size:clamp(34px,7.4vh,90px);font-weight:700;letter-spacing:-.02em}
+.r-sub{font-size:clamp(18px,3vh,36px);color:var(--ink2)}
+.tiles{display:flex;flex-wrap:wrap;gap:1.4vw;justify-content:center;width:min(96vw,1500px)}
+.tile{background:#fff;border:4px solid var(--ink);border-radius:26px;padding:1.6vh 1.8vw;min-width:min(19vw,260px);box-shadow:0 7px 0 var(--ink)}
+.tile small{display:block;color:var(--ink2);font-size:.95em}
+.tile b{display:block;font-size:clamp(34px,7vh,86px);font-weight:700;line-height:1.1}
+.tile em{font-style:normal;font-size:.9em;color:var(--blue-d);font-weight:600}
+.teamcard{background:#fff;border:4px solid var(--ink);border-radius:26px;padding:1.6vh 1.8vw;min-width:min(24vw,330px);box-shadow:0 7px 0 var(--ink);text-align:left}
+.teamcard h3{font-size:1.3em;margin-bottom:.8vh}
+.teamcard p{font-size:1em;color:var(--ink2)}
+.teamcard p b{color:var(--ink)}
+.missed{width:min(96vw,1200px);background:#fff;border:3px solid var(--line);border-radius:24px;padding:2vh 2vw}
+.missed h3{font-size:1.25em;margin-bottom:1vh}
+.missed-list{display:flex;flex-wrap:wrap;gap:1.2vw;justify-content:center}
+.mq{display:flex;align-items:center;gap:.7em;background:var(--soft-l);border:3px solid var(--soft);border-radius:99px;padding:.25em 1em .25em .3em}
+.mq b{width:2em;height:2em;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center}
+.note{font-size:.9em;color:var(--ink2);max-width:60ch}
+
+/* ---------- motion + small screens ---------- */
+body.reduce *{animation:none!important;transition:none!important}
+body.reduce .hero circle{transform:none}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (max-aspect-ratio:1/1){
+  .hud{grid-template-columns:1fr auto;gap:1vh 3vw}
+  .roundbox{grid-column:1/-1;order:3;width:100%}
+  .steps{grid-template-columns:repeat(2,1fr)}
+  .levels,.groups{grid-template-columns:1fr 1fr}
+  .tile{min-width:40vw}
+}
+@media (max-width:640px){.groups,.levels{grid-template-columns:1fr}.steps{grid-template-columns:1fr}.stats{gap:2vw}}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- Welcome -->
+  <section id="screen-welcome" class="screen">
+    <h1 class="wordmark">Flash Frame<span class="bolt" aria-hidden="true">⚡</span></h1>
+    <p class="subtitle">The One-Second Challenge</p>
+    <div class="hero-frame" id="heroFrame"></div>
+    <p class="tagline">See it. Remember it. Know it!</p>
+    <button class="btn primary start-btn" data-action="start">START GAME</button>
+    <p class="setup-line" id="setupLine"></p>
+    <button class="btn small ghost corner" data-action="settings">Teacher settings</button>
+  </section>
+
+  <!-- Rules / demo intro -->
+  <section id="screen-rules" class="screen" hidden>
+    <h2>How to play</h2>
+    <ol class="steps">
+      <li>Look at the five-frame.</li>
+      <li>Remember how many dots you saw.</li>
+      <li>Wait for the frame to disappear.</li>
+      <li id="step4">Tap the number that matches the dots.</li>
+    </ol>
+    <p class="setup-line" id="rulesTeam" hidden></p>
+    <div class="row">
+      <button class="btn primary" data-action="demo-start">Show me an example</button>
+      <button class="btn small ghost" data-action="skip-demo">Skip the example</button>
+    </div>
+  </section>
+
+  <!-- Game -->
+  <section id="screen-game" class="screen" hidden>
+    <header class="hud">
+      <div class="brand">Flash Frame</div>
+      <div class="roundbox">
+        <div class="roundtext" id="roundText"></div>
+        <div class="bar" id="barWrap"><i id="barFill"></i></div>
+      </div>
+      <div class="stats" id="stats"></div>
+      <button class="btn small" data-action="pause" id="pauseBtn">Pause</button>
+    </header>
+    <div class="teams" id="teams" hidden></div>
+    <div class="arena">
+      <div class="pad t0" id="pad0" hidden><div class="pad-head"><span>Team 1</span><span class="pad-score">0</span></div><div class="pad-status"></div><div class="pad-keys"><button class="tkey" data-action="tanswer" data-team="0" data-n="1">1<small>Q</small></button><button class="tkey" data-action="tanswer" data-team="0" data-n="2">2<small>W</small></button><button class="tkey" data-action="tanswer" data-team="0" data-n="3">3<small>E</small></button><button class="tkey" data-action="tanswer" data-team="0" data-n="4">4<small>R</small></button><button class="tkey" data-action="tanswer" data-team="0" data-n="5">5<small>T</small></button></div></div>
+    <main class="play">
+      <div class="stage" id="stage"></div>
+      <div class="msg" id="msg" aria-live="polite"></div>
+      <div class="actions" id="actions"></div>
+      <div class="answers" id="answers">
+        <button class="ans" data-action="answer" data-n="1">1</button>
+        <button class="ans" data-action="answer" data-n="2">2</button>
+        <button class="ans" data-action="answer" data-n="3">3</button>
+        <button class="ans" data-action="answer" data-n="4">4</button>
+        <button class="ans" data-action="answer" data-n="5">5</button>
+      </div>
+    </main>
+      <div class="pad t1" id="pad1" hidden><div class="pad-head"><span>Team 2</span><span class="pad-score">0</span></div><div class="pad-status"></div><div class="pad-keys"><button class="tkey" data-action="tanswer" data-team="1" data-n="1">1<small>Y</small></button><button class="tkey" data-action="tanswer" data-team="1" data-n="2">2<small>U</small></button><button class="tkey" data-action="tanswer" data-team="1" data-n="3">3<small>I</small></button><button class="tkey" data-action="tanswer" data-team="1" data-n="4">4<small>O</small></button><button class="tkey" data-action="tanswer" data-team="1" data-n="5">5<small>P</small></button></div></div>
+      <div class="pad t2" id="pad2" hidden><div class="pad-head"><span>Team 3</span><span class="pad-score">0</span></div><div class="pad-status"></div><div class="pad-keys"><button class="tkey" data-action="tanswer" data-team="2" data-n="1">1<small>Z</small></button><button class="tkey" data-action="tanswer" data-team="2" data-n="2">2<small>X</small></button><button class="tkey" data-action="tanswer" data-team="2" data-n="3">3<small>C</small></button><button class="tkey" data-action="tanswer" data-team="2" data-n="4">4<small>V</small></button><button class="tkey" data-action="tanswer" data-team="2" data-n="5">5<small>B</small></button></div></div>
+    </div>
+  </section>
+
+  <!-- Settings -->
+  <section id="screen-settings" class="screen" hidden>
+    <div class="settings-head">
+      <h2>Teacher settings</h2>
+      <p>Changes save automatically on this device. Pick a level to start from, then adjust anything you like.</p>
+    </div>
+    <div class="settings-body" id="settingsBody"></div>
+    <div class="settings-foot">
+      <button class="btn ghost" data-action="settings-back">Back to home</button>
+      <button class="btn primary" data-action="settings-start">Start game</button>
+    </div>
+  </section>
+
+  <!-- Results -->
+  <section id="screen-results" class="screen" hidden>
+    <div class="trophy" aria-hidden="true">🏆</div>
+    <h1 id="resTitle">Flash Frame Champion!</h1>
+    <p class="r-sub">Your visual memory is growing.</p>
+    <div id="resBody" class="tiles"></div>
+    <div id="resMissed"></div>
+    <p class="note">One short game is a snapshot, not proof of mastery. Play a few sessions and look for patterns.</p>
+    <div class="row">
+      <button class="btn primary" data-action="play-again">Play again</button>
+      <button class="btn" data-action="practise" id="practiseBtn" hidden>Practise missed numbers</button>
+      <button class="btn" data-action="adjust">Adjust difficulty</button>
+      <button class="btn ghost" data-action="home">Back to home</button>
+    </div>
+  </section>
+
+  <!-- Pause -->
+  <div id="pauseOverlay" class="overlay" hidden role="dialog" aria-label="Game paused">
+    <h2>Paused</h2>
+    <p>Your round is safe. Press Resume to carry on.</p>
+    <div class="row">
+      <button class="btn primary" data-action="resume">Resume</button>
+      <button class="btn" data-action="restart">Restart session</button>
+      <button class="btn ghost" data-action="home">Back to home</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======================= GAME LOGIC (no DOM) ======================= -->
+<script id="logic">
+const FF=(function(){
+  'use strict';
+  const POINTS={first:10,retry:5,complete:10,streak:5,streakEvery:3};
+
+  function range(a,b){const r=[];for(let i=a;i<=b;i++)r.push(i);return r;}
+  function shuffle(a,rnd){rnd=rnd||Math.random;const r=a.slice();for(let i=r.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));const t=r[i];r[i]=r[j];r[j]=t;}return r;}
+
+  /* ----- five-frame data + rendering ----- */
+  const Frames={
+    standard(q){return range(0,4).map(i=>i<q);},
+    varied(q,rnd){const pos=shuffle(range(0,4),rnd).slice(0,q);return range(0,4).map(i=>pos.indexOf(i)!==-1);},
+    count(c){return c.filter(Boolean).length;},
+    key(c){return c.map(v=>v?'1':'0').join('');},
+    validate(c,q){
+      return Array.isArray(c)&&c.length===5&&c.every(v=>typeof v==='boolean')&&
+             Number.isInteger(q)&&q>=1&&q<=5&&Frames.count(c)===q;
+    },
+    svg(c){
+      const W=1000,H=200,cw=W/5;let s='';
+      s+='<svg class="frame" viewBox="-5 -5 1010 210" role="img" aria-label="Five-frame" xmlns="http://www.w3.org/2000/svg">';
+      s+='<rect x="0" y="0" width="'+W+'" height="'+H+'" fill="#fff" stroke="#000" stroke-width="6"/>';
+      for(let i=1;i<5;i++)s+='<line x1="'+i*cw+'" y1="0" x2="'+i*cw+'" y2="'+H+'" stroke="#000" stroke-width="5"/>';
+      c.forEach((on,i)=>{if(on)s+='<circle style="--i:'+i+'" cx="'+(i*cw+cw/2)+'" cy="'+H/2+'" r="62" fill="#000"/>';});
+      return s+'</svg>';
+    }
+  };
+
+  /* ----- balanced round generation ----- */
+  function generateRounds(o){
+    const rnd=o.rnd||Math.random,n=o.count;
+    let pool=Array.from(new Set((o.quantities||[]).filter(q=>q>=1&&q<=5))).sort((a,b)=>a-b);
+    if(!pool.length)pool=[1,2,3,4,5];
+    const seq=[];
+    while(seq.length<n){
+      const b=shuffle(pool,rnd);
+      if(seq.length&&b.length>1&&b[0]===seq[seq.length-1]){const t=b[0];b[0]=b[1];b[1]=t;}
+      Array.prototype.push.apply(seq,b);
+    }
+    seq.length=n;
+    const uid=Date.now().toString(36)+Math.floor((rnd()*1e6)).toString(36);
+    let prev=null;
+    return seq.map((q,i)=>{
+      let cells,tries=0;
+      do{cells=o.pattern==='varied'?Frames.varied(q,rnd):Frames.standard(q);tries++;}
+      while(o.pattern==='varied'&&q<5&&prev&&Frames.key(cells)===prev&&tries<25);
+      if(!Frames.validate(cells,q))throw new Error('Invalid frame generated');
+      prev=Frames.key(cells);
+      return {id:uid+'-'+(i+1),index:i,qty:q,cells:cells};
+    });
+  }
+
+  /* ----- scoring (kept separate from the interface) ----- */
+  function newPlayer(name){return {name:name,score:0,streak:0,longest:0,scored:0,firstCorrect:0,retryCorrect:0};}
+  const Scoring={
+    first(p,correct,cfg){
+      const res={pts:0,bonus:0};
+      p.scored++;
+      if(correct){
+        p.firstCorrect++;p.streak++;p.longest=Math.max(p.longest,p.streak);
+        if(cfg.scoring==='points'){
+          res.pts=POINTS.first;
+          if(cfg.bonuses&&p.streak%POINTS.streakEvery===0)res.bonus=POINTS.streak;
+        }
+      }else{p.streak=0;}
+      p.score+=res.pts+res.bonus;
+      return res;
+    },
+    retry(p,correct,cfg){
+      if(!correct)return 0;
+      p.retryCorrect++;
+      if(cfg.scoring==='points'){p.score+=POINTS.retry;return POINTS.retry;}
+      return 0;
+    },
+    complete(p,cfg){
+      if(cfg.scoring==='points'&&cfg.bonuses&&p.scored>0){p.score+=POINTS.complete;return POINTS.complete;}
+      return 0;
+    }
+  };
+
+  /* ----- results ----- */
+  function accuracy(fc,n){return n>0?Math.round(100*fc/n):null;}
+  function computeResults(s){
+    const per={};range(1,5).forEach(q=>{per[q]={qty:q,shown:0,missed:0};});
+    s.log.forEach(e=>{if(e.first){per[e.qty].shown++;if(!e.first.correct)per[e.qty].missed++;}});
+    const players=s.players.map(p=>({name:p.name,scored:p.scored,firstCorrect:p.firstCorrect,
+      accuracy:accuracy(p.firstCorrect,p.scored),retryCorrect:p.retryCorrect,score:p.score,longest:p.longest}));
+    const sum=k=>players.reduce((a,p)=>a+p[k],0);
+    const scored=sum('scored'),fc=sum('firstCorrect');
+    return {
+      players:players,
+      totals:{rounds:s.log.length,scored:scored,firstCorrect:fc,accuracy:accuracy(fc,scored),
+              retryCorrect:sum('retryCorrect'),score:sum('score'),
+              longest:players.reduce((a,p)=>Math.max(a,p.longest),0)},
+      missed:Object.keys(per).map(k=>per[k]).filter(x=>x.missed>0).sort((a,b)=>b.missed-a.missed||a.qty-b.qty),
+      revealed:s.log.filter(e=>e.revealed).length
+    };
+  }
+
+  return {POINTS,range,shuffle,Frames,generateRounds,newPlayer,Scoring,computeResults,accuracy};
+})();
+</script>
+
+<!-- ======================= INTERFACE + STATE MACHINE ======================= -->
+<script id="ui">
+(function(){
+'use strict';
+
+/* ---------- config ---------- */
+const STORE_KEY='flashframe.settings.v1';
+const FLASH_OPTIONS=[100,200,300,400,500];   // ascending; 0.5 sec is the longest
+const ROUND_OPTIONS=[5,10,15,20];
+const READY_MS=900, AUTO_NEXT_MS=2400, DEMO_FLASH_MS=3000, DEMO_QTYS=[2,3];
+const TEAM_KEYS=[['KeyQ','KeyW','KeyE','KeyR','KeyT'],['KeyY','KeyU','KeyI','KeyO','KeyP'],['KeyZ','KeyX','KeyC','KeyV','KeyB']];
+const WORDS=['zero','one','two','three','four','five'];
+const LEVELS=[
+  {name:'Gentle Glance',   detail:'0.5 sec, numbers 1 to 3',          flashMs:500,maxQty:3,pattern:'standard'},
+  {name:'Quick Look',      detail:'0.4 sec, numbers 1 to 5',          flashMs:400,maxQty:5,pattern:'standard'},
+  {name:'Flash Master',    detail:'0.3 sec, numbers 1 to 5',          flashMs:300,maxQty:5,pattern:null},
+  {name:'Lightning Memory',detail:'0.1 sec, varied patterns',         flashMs:100,maxQty:5,pattern:'varied'}
+];
+const DEFAULTS={rounds:10,flashMs:500,maxQty:5,pattern:'standard',feedback:'immediate',retry:true,
+  scoring:'points',bonuses:true,autoNext:false,sound:false,mode:'individual',teams:2,reducedMotion:false};
+const ALLOWED={rounds:ROUND_OPTIONS,flashMs:FLASH_OPTIONS,maxQty:[3,5],pattern:['standard','varied'],
+  feedback:['immediate','teacher'],retry:[true,false],scoring:['points','accuracy','none'],bonuses:[true,false],
+  autoNext:[true,false],sound:[true,false],mode:['individual','team','class'],teams:[2,3],reducedMotion:[true,false]};
+const fmt=ms=>(ms/1000)+' sec';
+
+/* ---------- tiny helpers ---------- */
+const $=s=>document.querySelector(s), $$=s=>Array.prototype.slice.call(document.querySelectorAll(s));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const dots=q=>q===1?'dot':'dots', were=q=>q===1?'was':'were';
+
+/* ---------- settings store ---------- */
+function loadSettings(){
+  const s=Object.assign({},DEFAULTS);
+  try{
+    const raw=localStorage.getItem(STORE_KEY);
+    if(raw){const o=JSON.parse(raw);Object.keys(DEFAULTS).forEach(k=>{if(k in o&&ALLOWED[k].indexOf(o[k])!==-1)s[k]=o[k];});}
+  }catch(e){}
+  return s;
+}
+function saveSettings(){try{localStorage.setItem(STORE_KEY,JSON.stringify(settings));}catch(e){}}
+let settings=loadSettings();
+
+/* ---------- pausable single timer ---------- */
+const T={
+  id:null,cb:null,remaining:0,startedAt:0,running:false,
+  start(ms,cb){this.clear();this.cb=cb;this.remaining=ms;this._run();},
+  _run(){
+    const self=this;this.startedAt=performance.now();this.running=true;
+    this.id=setTimeout(function(){const f=self.cb;self.id=null;self.running=false;self.cb=null;if(f)f();},this.remaining);
+  },
+  pause(){if(this.running){clearTimeout(this.id);this.id=null;this.remaining=Math.max(0,this.remaining-(performance.now()-this.startedAt));this.running=false;}},
+  resume(){if(this.cb&&!this.running)this._run();},
+  clear(){clearTimeout(this.id);this.id=null;this.cb=null;this.running=false;this.remaining=0;}
+};
+
+/* ---------- sound (soft, optional) ---------- */
+let actx=null;
+function tone(freqs){
+  if(!settings.sound)return;
+  try{
+    actx=actx||new (window.AudioContext||window.webkitAudioContext)();
+    const t0=actx.currentTime,d=0.15;
+    freqs.forEach(function(f,i){
+      const o=actx.createOscillator(),g=actx.createGain(),t=t0+i*d;
+      o.type='sine';o.frequency.value=f;
+      g.gain.setValueAtTime(0.0001,t);g.gain.linearRampToValueAtTime(0.1,t+0.02);g.gain.exponentialRampToValueAtTime(0.0001,t+d+0.18);
+      o.connect(g);g.connect(actx.destination);o.start(t);o.stop(t+d+0.2);
+    });
+  }catch(e){}
+}
+
+/* ---------- state ---------- */
+const G={screen:'welcome',session:null,R:null,phase:'IDLE',paused:false,tok:0,demo:null,lastOpts:{},returnTo:'welcome',lastScore:null};
+
+function showScreen(name){
+  T.clear();G.tok++;G.paused=false;G.phase='IDLE';
+  $('#pauseOverlay').hidden=true;
+  ['welcome','rules','game','settings','results'].forEach(n=>{$('#screen-'+n).hidden=(n!==name);});
+  G.screen=name;
+  if(name==='welcome')refreshWelcome();
+  if(name==='settings')refreshSettings();
+  if(name==='rules')refreshRules();
+}
+function applyMotion(){
+  const sys=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.body.classList.toggle('reduce',settings.reducedMotion||sys);
+}
+
+/* ---------- welcome ---------- */
+function refreshWelcome(){
+  $('#heroFrame').innerHTML=FF.Frames.svg([true,true,true,true,true]).replace('class="frame"','class="frame hero"');
+  const modeTxt={individual:'solo',team:settings.teams+' teams',class:'whole class'}[settings.mode];
+  $('#setupLine').textContent='Current setup: '+settings.rounds+' rounds, '+fmt(settings.flashMs)+' flash, numbers 1 to '+settings.maxQty+', '+modeTxt+'.';
+}
+
+function refreshRules(){
+  const team=settings.mode==='team';
+  $('#step4').textContent=team?'First team to tap the right number wins the point.':'Tap the number that matches the dots.';
+  const n=$('#rulesTeam');n.hidden=!team;
+  n.textContent='Keys for numbers 1 to 5: Team 1 Q W E R T, Team 2 Y U I O P'+(settings.teams===3?', Team 3 Z X C V B':'')+'. Or just tap your own keypad.';
+}
+
+/* ---------- session + rounds ---------- */
+function startDemo(){
+  G.session=null;G.demo={count:0};showScreen('game');nextDemoExample();
+}
+function nextDemoExample(){
+  const q=DEMO_QTYS[G.demo.count];G.demo.count++;
+  G.R={item:{id:'demo-'+q,qty:q,cells:FF.Frames.standard(q)},demo:true,attempt:1,locked:false,answer:null,playerIdx:0,resolvedAttempt:0};
+  startReady();
+}
+function startSession(opts){
+  opts=opts||{};G.lastOpts=opts;
+  const cfg=Object.assign({},settings);
+  const names=cfg.mode==='team'?FF.range(1,cfg.teams).map(i=>'Team '+i):[cfg.mode==='class'?'Class':'You'];
+  G.demo=null;
+  G.session={
+    cfg:cfg,flashMs:cfg.flashMs,flashUsed:[cfg.flashMs],
+    rounds:FF.generateRounds({count:cfg.rounds,quantities:opts.quantities||FF.range(1,cfg.maxQty),pattern:cfg.pattern}),
+    index:0,players:names.map(FF.newPlayer),log:[],completed:false,wrongRun:0
+  };
+  G.lastScore=null;
+  showScreen('game');beginRound();
+}
+function beginRound(){
+  const s=G.session,item=s.rounds[s.index];
+  G.R={item:item,demo:false,attempt:1,locked:false,answer:null,firstAnswer:null,playerIdx:s.index%s.players.length,
+       resolvedAttempt:0,revealOnly:false,entry:null,result:null,replay:false,notice:'',ta:s.players.map(()=>null),winner:null};
+  startReady();
+}
+function flashMs(){return G.R.demo?DEMO_FLASH_MS:G.session.flashMs;}
+
+function startReady(){
+  const tok=++G.tok;T.clear();G.phase='READY';render();
+  T.start(READY_MS,function(){if(tok!==G.tok)return;startFlash();});
+}
+function startFlash(){
+  const tok=++G.tok;G.phase='FLASHING';render();
+  // start the clock on the frame that actually paints, so very short flashes are not clipped
+  requestAnimationFrame(function(){
+    if(tok!==G.tok)return;
+    T.start(flashMs(),function(){if(tok!==G.tok)return;endFlash();});
+    if(G.paused)T.pause();
+  });
+}
+function endFlash(){
+  ++G.tok;
+  if(G.R.replay){G.R.replay=false;G.phase='FEEDBACK';render();scheduleAuto();return;}
+  G.R.locked=false;G.phase='RECALL';render();
+}
+
+function onAnswer(n){
+  if(G.paused||G.phase!=='RECALL')return;
+  const R=G.R;if(R.locked)return;
+  R.locked=true;R.answer=n;if(R.attempt===1)R.firstAnswer=n;
+  const immediate=R.demo||G.session.cfg.feedback==='immediate';
+  if(immediate)resolve();else{++G.tok;G.phase='LOCKED';render();}
+}
+function onRevealClass(){
+  if(G.paused||G.phase!=='RECALL'||G.R.locked)return;
+  G.R.locked=true;G.R.revealOnly=true;resolve();
+}
+function onTeamAnswer(t,n){
+  const s=G.session;
+  if(G.paused||G.phase!=='RECALL'||!s||s.cfg.mode!=='team')return;
+  const R=G.R;if(R.ta[t]!==null)return;                 // one answer per team per round
+  R.ta[t]=n;
+  if(n===R.item.qty){R.winner=t;resolveTeam();}
+  else if(R.ta.every(x=>x!==null)){R.winner=null;resolveTeam();}
+  else render();                                          // this team is locked out; the other can still win
+}
+function resolveTeam(){
+  const R=G.R,s=G.session;
+  if(R.resolvedAttempt===R.attempt)return;
+  R.resolvedAttempt=R.attempt;++G.tok;T.clear();G.phase='FEEDBACK';
+  R.result={correct:null,attempt:1,pts:0,bonus:0};
+  if(R.winner!==null)s.players[R.winner].score++;
+  s.log.push({id:R.item.id,qty:R.item.qty,player:R.winner,winner:R.winner,first:null,retry:null,revealed:false});
+  tone(R.winner!==null?[523,659,784]:[392]);
+  render();scheduleAuto();
+}
+function onRevealLocked(){if(!G.paused&&G.phase==='LOCKED')resolve();}
+
+function resolve(){
+  const R=G.R;
+  if(R.resolvedAttempt===R.attempt)return;               // never score an attempt twice
+  R.resolvedAttempt=R.attempt;++G.tok;T.clear();G.phase='FEEDBACK';
+  const q=R.item.qty,correct=R.revealOnly?null:(R.answer===q);
+  R.result={correct:correct,attempt:R.attempt,pts:0,bonus:0};
+  if(!R.demo){
+    const s=G.session,p=s.players[R.playerIdx];
+    if(R.revealOnly){
+      s.log.push({id:R.item.id,qty:q,player:R.playerIdx,first:null,retry:null,revealed:true});
+    }else if(R.attempt===1){
+      const r=FF.Scoring.first(p,correct,s.cfg);R.result.pts=r.pts;R.result.bonus=r.bonus;
+      R.entry={id:R.item.id,qty:q,player:R.playerIdx,first:{answer:R.answer,correct:correct},retry:null,revealed:false};
+      s.log.push(R.entry);s.wrongRun=correct?0:s.wrongRun+1;
+    }else{
+      R.entry.retry={answer:R.answer,correct:correct};
+      R.result.pts=FF.Scoring.retry(p,correct,s.cfg);
+    }
+  }
+  if(correct===true)tone([523,659,784]);else if(correct===false)tone([392]);
+  render();scheduleAuto();
+}
+function retryOffered(){
+  const R=G.R;
+  return !R.demo&&!R.revealOnly&&R.attempt===1&&R.result&&R.result.correct===false&&G.session.cfg.retry;
+}
+function scheduleAuto(){
+  const R=G.R;
+  if(R.demo||!G.session.cfg.autoNext||retryOffered())return;
+  const tok=G.tok;
+  T.start(AUTO_NEXT_MS,function(){if(tok!==G.tok)return;onNext();});
+}
+function onRetry(){
+  if(G.paused||G.phase!=='FEEDBACK'||!retryOffered())return;
+  const R=G.R;R.attempt=2;R.locked=false;R.answer=null;R.result=null;R.notice='';
+  startReady();                                           // same frame, flashed again
+}
+function onReplay(){
+  if(G.paused||G.phase!=='FEEDBACK'||G.R.demo)return;
+  G.R.replay=true;G.R.notice='';startReady();
+}
+function onLonger(){
+  const s=G.session;if(!s||G.phase!=='FEEDBACK')return;
+  const next=FLASH_OPTIONS.filter(v=>v>s.flashMs)[0];if(!next)return;
+  s.flashMs=next;s.flashUsed.push(next);s.wrongRun=0;
+  G.R.notice='Flash time is now '+fmt(next)+' for the next rounds.';render();
+}
+function onNext(){
+  if(G.paused||G.phase!=='FEEDBACK')return;
+  const s=G.session;++G.tok;T.clear();
+  if(!s)return;
+  if(s.index+1>=s.rounds.length)finishSession();else{s.index++;beginRound();}
+}
+function finishSession(){
+  const s=G.session;
+  if(!s.completed){s.completed=true;s.players.forEach(p=>FF.Scoring.complete(p,s.cfg));}
+  renderResults(FF.computeResults(s));showScreen('results');
+}
+
+/* ---------- pause ---------- */
+function pause(){
+  if(G.screen!=='game'||G.paused)return;
+  G.paused=true;T.pause();$('#pauseOverlay').hidden=false;$('#screen-game').classList.add('is-paused');
+  const b=$('#pauseOverlay [data-action="resume"]');if(b)b.focus();
+}
+function resume(){
+  if(!G.paused)return;
+  G.paused=false;$('#pauseOverlay').hidden=true;$('#screen-game').classList.remove('is-paused');T.resume();
+}
+
+/* ---------- rendering the game screen ---------- */
+function render(){
+  if(G.screen!=='game'||!G.R)return;
+  const team=!!(G.session&&G.session.cfg.mode==='team');
+  $('#screen-game').classList.toggle('team-mode',team);
+  const nt=team?G.session.players.length:0;
+  $('#screen-game').classList.toggle('teams3',nt===3);
+  [0,1,2].forEach(i=>{$('#pad'+i).hidden=!(i<nt);});$('#answers').hidden=team;
+  renderHud();renderStage();renderMsg();renderAnswers();if(team)renderPads();
+  $('#screen-game').classList.toggle('is-paused',G.paused);
+}
+function activePlayer(){return G.session?G.session.players[G.R.playerIdx]:null;}
+
+function renderHud(){
+  const s=G.session,st=$('#stats'),tm=$('#teams');
+  if(!s){
+    $('#roundText').textContent='Practice round';$('#barWrap').hidden=true;st.hidden=true;tm.hidden=true;return;
+  }
+  const n=s.rounds.length,done=s.index+(G.phase==='FEEDBACK'?1:0);
+  $('#roundText').textContent='Round '+(s.index+1)+' / '+n;
+  $('#barWrap').hidden=false;$('#barFill').style.width=(100*done/n)+'%';
+  if(s.cfg.mode==='team'){st.hidden=true;tm.hidden=true;return;}
+  const p=activePlayer(),sc=s.cfg.scoring;
+  if(sc==='none'){st.hidden=true;}
+  else{
+    st.hidden=false;
+    const first=sc==='points'?'<div class="stat" id="scoreStat"><small>Score</small><b>'+p.score+' pts</b></div>'
+      :'<div class="stat"><small>First tries</small><b>'+p.firstCorrect+' / '+p.scored+'</b></div>';
+    st.innerHTML=first+'<div class="stat"><small>Streak</small><b>🔥 '+p.streak+'</b></div>';
+    if(sc==='points'){
+      const prev=G.lastScore;
+      if(prev&&prev.idx===G.R.playerIdx&&prev.val!==p.score)$('#scoreStat').classList.add('bump');
+      G.lastScore={idx:G.R.playerIdx,val:p.score};
+    }
+  }
+  tm.hidden=true;
+}
+
+function renderStage(){
+  const R=G.R,ph=G.phase,st=$('#stage');
+  if(ph==='READY'){
+    st.innerHTML='<div class="ready" style="--ready:'+READY_MS+'ms"><span class="ring"></span></div>';
+  }else if(ph==='FLASHING'){
+    st.innerHTML='<div class="frame-wrap">'+FF.Frames.svg(R.item.cells)+'</div>';
+  }else if(ph==='RECALL'||ph==='LOCKED'){
+    st.innerHTML='<div class="qmark" aria-hidden="true">?</div>';
+  }else if(ph==='FEEDBACK'){
+    const q=R.item.qty;
+    st.innerHTML='<div class="reveal"><span class="bignum">'+q+'</span><span class="unit">'+dots(q)+'</span></div>';
+  }else st.innerHTML='';
+}
+
+function renderPads(){
+  const s=G.session,R=G.R,ph=G.phase,q=R.item.qty;
+  s.players.forEach(function(_,t){
+    const pad=$('#pad'+t),done=R.ta[t]!==null;
+    pad.querySelector('.pad-score').textContent=s.players[t].score;
+    pad.classList.toggle('won',ph==='FEEDBACK'&&R.winner===t);
+    pad.classList.toggle('locked',ph==='RECALL'&&done);
+    let status='Watch the frame';
+    if(ph==='RECALL')status=done?'Locked in':'Tap your number!';
+    if(ph==='FEEDBACK')status=R.winner===t?'You win the point!':(done?'Good try!':'');
+    pad.querySelector('.pad-status').textContent=status;
+    const active=ph==='RECALL'&&!done&&!G.paused;
+    pad.querySelectorAll('.tkey').forEach(function(b){
+      const n=+b.dataset.n;b.className='tkey';b.disabled=!active;
+      if(ph==='FEEDBACK'){
+        if(n===q)b.classList.add('good');
+        else if(R.ta[t]===n)b.classList.add('gentle');
+      }
+    });
+  });
+}
+function describeTeam(){
+  const R=G.R,s=G.session,ph=G.phase,q=R.item.qty,w=WORDS[q];
+  const o={main:'',sub:'',chips:[],actions:[]};
+  if(ph==='READY'){o.main='Get ready…';o.sub=R.replay?'Here it comes again.':'Both teams, watch the frame!';}
+  else if(ph==='FLASHING'){o.main='👀 Look carefully!';o.sub='Next: the first team to tap the right number wins the point.';}
+  else if(ph==='RECALL'){
+    const missed=[],left=[];
+    R.ta.forEach(function(x,i){(x!==null?missed:left).push('Team '+(i+1));});
+    if(missed.length){o.main=missed.join(' and ')+' missed.';o.sub=left.join(' and ')+' can still win it!';}
+    else{o.main='How many dots? Be first!';o.sub='Tap your number on your own keypad.';}
+  }else if(ph==='FEEDBACK'){
+    const isLast=s.index+1>=s.rounds.length;
+    if(R.winner!==null){o.main='Team '+(R.winner+1)+' wins the point!';o.sub='There '+were(q)+' '+w+' '+dots(q)+'.';o.chips.push({t:'+1 point',c:''});}
+    else{o.main='Nobody got it this time.';o.sub='There '+were(q)+' '+w+' '+dots(q)+'.';}
+    o.actions.push({a:'next',t:isLast?'See results':'Next round',c:'primary'});
+    o.actions.push({a:'replay',t:'Show it again',c:'ghost small'});
+  }
+  return o;
+}
+function describe(){
+  if(G.session&&G.session.cfg.mode==='team')return describeTeam();
+  const R=G.R,s=G.session,ph=G.phase,q=R.item.qty,w=WORDS[q];
+  const o={main:'',sub:'',chips:[],actions:[]};
+  const team=s&&s.cfg.mode==='team';
+  if(ph==='READY'){
+    o.main=team?s.players[R.playerIdx].name+', get ready…':'Get ready…';
+    o.sub=R.replay?'Here it comes again.':(R.attempt===2?'Look once more, then choose.':'');
+  }else if(ph==='FLASHING'){
+    o.main='👀 Look carefully!';o.sub='Next: remember the dots and choose the number.';
+  }else if(ph==='RECALL'){
+    o.main=R.attempt===2?'Try again: how many dots?':'How many dots did you see?';
+    if(s&&s.cfg.mode==='class'){
+      o.sub='Everyone decide quietly. Then tap the class answer, or reveal it.';
+      o.actions.push({a:'reveal-class',t:'Reveal the answer',c:'ghost small'});
+    }
+  }else if(ph==='LOCKED'){
+    o.main='Answer locked in.';o.sub='Press Reveal when you are ready to see the answer.';
+    o.actions.push({a:'reveal-locked',t:'Reveal answer',c:'primary'});
+  }else if(ph==='FEEDBACK'){
+    const r=R.result,isLast=s&&s.index+1>=s.rounds.length;
+    const nextLabel=isLast?'See results':'Next round';
+    if(R.demo){
+      if(r.correct){o.main='Brilliant! You remembered '+w+' '+dots(q)+'!';o.sub='Now you know how it works.';}
+      else{o.main='Good try! There '+were(q)+' '+w+' '+dots(q)+'.';o.sub=G.demo.count<2?'Look closely and remember. Let us try one more.':'Remember the dots, then tap the number. You can do this!';}
+      if(r.correct||G.demo.count>=2)o.actions.push({a:'demo-finish',t:'Start playing',c:'primary'});
+      else o.actions.push({a:'demo-another',t:'Try another example',c:'primary'});
+    }else{
+      if(r.correct===null){o.main='There '+were(q)+' '+w+' '+dots(q)+'.';o.sub='Talk about how you knew.';}
+      else if(r.attempt===1&&r.correct){
+        const m=[function(){return 'Amazing! You spotted '+w+'!';},function(){return 'Brilliant visual memory!';},function(){return 'You knew it without counting!';}];
+        o.main=pick(m)();
+        if(r.pts)o.chips.push({t:'+'+r.pts+' points',c:''});
+        if(r.bonus)o.chips.push({t:'+'+r.bonus+' streak bonus',c:'sun'});
+        if(r.bonus)o.sub=G.R.playerIdx>=0?s.players[R.playerIdx].streak+' in a row!':'';
+      }else if(r.attempt===1){
+        o.main='Good try! There '+were(q)+' '+w+' '+dots(q)+'.';
+        o.sub=s.cfg.retry?'Look once more and try again.':'Keep practising. Your number recognition is growing.';
+      }else if(r.correct){
+        o.main='Well done! You got it on the second look.';
+        if(r.pts)o.chips.push({t:'+'+r.pts+' points',c:''});
+      }else{
+        o.main='Good try! There '+were(q)+' '+w+' '+dots(q)+'.';o.sub='Keep practising. Your number recognition is growing.';
+      }
+      const offered=retryOffered();
+      if(offered)o.actions.push({a:'retry',t:'Try again',c:'primary'});
+      o.actions.push({a:'next',t:nextLabel,c:offered?'':'primary'});
+      if(!offered)o.actions.push({a:'replay',t:'Show it again',c:'ghost small'});
+      const nextFlash=FLASH_OPTIONS.filter(v=>v>s.flashMs)[0];
+      if(r.attempt===1&&r.correct===false&&s.wrongRun>=2&&nextFlash)
+        o.actions.push({a:'longer',t:'Try a longer flash ('+fmt(nextFlash)+')',c:'ghost small'});
+      if(R.notice)o.sub=R.notice;
+    }
+  }
+  return o;
+}
+function renderMsg(){
+  const o=describe();
+  $('#msg').innerHTML='<p class="msg-main">'+o.main+'</p>'+(o.sub?'<p class="msg-sub">'+o.sub+'</p>':'')+
+    (o.chips.length?'<div class="chips">'+o.chips.map(c=>'<span class="chip '+c.c+'">'+c.t+'</span>').join('')+'</div>':'');
+  $('#actions').innerHTML=o.actions.map(a=>'<button class="btn '+a.c+'" data-action="'+a.a+'"'+(a.a==='next'?' id="nextBtn"':'')+'>'+a.t+'</button>').join('');
+}
+function renderAnswers(){
+  const R=G.R,ph=G.phase,box=$('#answers');
+  if(G.session&&G.session.cfg.mode==='team')return;
+  const show=ph==='RECALL'||ph==='LOCKED'||ph==='FEEDBACK';
+  box.style.visibility=show?'visible':'hidden';box.setAttribute('aria-hidden',show?'false':'true');
+  $$('#answers .ans').forEach(function(b){
+    const n=+b.dataset.n;b.className='ans';b.disabled=(ph!=='RECALL')||G.paused;
+    if(ph==='LOCKED'&&n===R.answer)b.classList.add('picked');
+    if(ph==='FEEDBACK'){
+      if(n===R.item.qty)b.classList.add('good');
+      else if(!R.revealOnly&&n===R.answer)b.classList.add('gentle');
+      else b.classList.add('dim');
+    }
+  });
+}
+
+/* ---------- results ---------- */
+function renderResults(res){
+  const s=G.session,cfg=s.cfg,body=$('#resBody'),t=res.totals;
+  const multi=cfg.mode!=='individual';
+  $('#resTitle').textContent=multi?'Flash Frame Champions!':'Flash Frame Champion!';
+  const flashTxt=s.flashUsed.length>1?s.flashUsed.map(v=>(v/1000)).join(' → ')+' sec':fmt(s.flashUsed[0]);
+  const tile=(label,val,extra)=>'<div class="tile"><small>'+label+'</small><b>'+val+'</b>'+(extra?'<em>'+extra+'</em>':'')+'</div>';
+  if(cfg.mode==='team'){
+    const sc=s.players.map(p=>p.score),none=s.log.filter(e=>e.winner===null).length;
+    const top=Math.max.apply(null,sc),leaders=sc.filter(v=>v===top).length;
+    $('#resTitle').textContent=leaders>1?'It is a draw!':'Team '+(sc.indexOf(top)+1)+' wins!';
+    body.innerHTML=s.players.map(p=>'<div class="teamcard"><h3>'+p.name+'</h3><p>Points won: <b>'+p.score+'</b></p></div>').join('')+
+      tile('Rounds played',t.rounds)+tile('Flash duration',flashTxt)+(none?tile('Rounds nobody got',none):'');
+    $('#resMissed').innerHTML='';$('#practiseBtn').hidden=true;return;
+  }
+  let h='';
+  if(cfg.scoring==='none'){
+    h+=tile('Rounds completed',t.rounds)+tile('Flash duration',flashTxt);
+  }else{
+    if(cfg.mode==='team'){
+      h+=res.players.map(function(p){
+        return '<div class="teamcard"><h3>'+p.name+'</h3><p>First-try answers: <b>'+p.firstCorrect+' / '+p.scored+'</b>'+(p.accuracy!==null?' ('+p.accuracy+'%)':'')+'</p>'+
+          (cfg.scoring==='points'?'<p>Points: <b>'+p.score+'</b></p>':'')+'<p>Longest streak: <b>'+p.longest+'</b></p></div>';
+      }).join('');
+    }else{
+      h+=tile('First-try accuracy',t.firstCorrect+'/'+t.scored,t.accuracy!==null?t.accuracy+'%':'');
+      if(cfg.scoring==='points')h+=tile('Total points',t.score);
+      h+=tile('Longest streak',t.longest);
+    }
+    h+=tile('Flash duration',flashTxt);
+    if(cfg.retry||t.retryCorrect)h+=tile('Right after a retry',t.retryCorrect);
+    if(res.revealed)h+=tile('Answers revealed',res.revealed);
+  }
+  body.innerHTML=h;
+  const mb=$('#resMissed'),pb=$('#practiseBtn');
+  if(cfg.scoring==='none'){mb.innerHTML='';pb.hidden=true;return;}
+  if(res.missed.length){
+    mb.innerHTML='<div class="missed"><h3>Numbers to practise</h3><div class="missed-list">'+
+      res.missed.map(m=>'<span class="mq"><b>'+m.qty+'</b>missed '+m.missed+' of '+m.shown+'</span>').join('')+'</div></div>';
+    pb.hidden=false;pb.dataset.q=res.missed.map(m=>m.qty).join(',');
+  }else{
+    mb.innerHTML='<div class="missed"><h3>No missed numbers this time</h3><p class="r-sub">Try a shorter flash or varied patterns for a new challenge.</p></div>';pb.hidden=true;
+  }
+}
+
+/* ---------- settings screen ---------- */
+const SPEC=[
+ {title:'The flash',items:[
+  {key:'flashMs',label:'Flash duration',hint:'How long the frame stays visible. Students are never rushed to answer.',opts:FLASH_OPTIONS.slice().reverse().map(v=>[v,fmt(v)])},
+  {key:'maxQty',label:'Quantity range',hint:'Which numbers can appear.',opts:[[3,'1 to 3'],[5,'1 to 5']]},
+  {key:'pattern',label:'Pattern mode',hint:'Standard fills boxes left to right. Varied mixes the positions.',opts:[['standard','Standard'],['varied','Varied']]}]},
+ {title:'The session',items:[
+  {key:'rounds',label:'Number of rounds',hint:'',opts:ROUND_OPTIONS.map(v=>[v,String(v)])},
+  {key:'mode',label:'Session mode',hint:'Solo is one student. Teams: each team has its own keypad and the first correct tap wins the point. Whole class: the teacher taps or reveals the class answer.',opts:[['individual','Solo'],['team','Teams'],['class','Whole class']]},
+  {key:'teams',label:'Number of teams',hint:'Teams race head to head. With 3 teams the frame is on top and the keypads run along the bottom.',opts:[[2,'2 teams'],[3,'3 teams']],showIf:s=>s.mode==='team'}]},
+ {title:'Feedback and scoring',wide:true,items:[
+  {key:'feedback',label:'Feedback',hint:'Teacher-controlled waits for you to press Reveal after each answer.',opts:[['immediate','Immediate'],['teacher','Teacher-controlled']],showIf:s=>s.mode!=='team'},
+  {key:'retry',label:'Retry after a miss',hint:'The same frame flashes again for one more try.',opts:[[true,'Enabled'],[false,'Disabled']],showIf:s=>s.mode!=='team'},
+  {key:'scoring',label:'Scoring',hint:'Unscored practice keeps no statistics.',opts:[['points','Points'],['accuracy','Accuracy only'],['none','Unscored']],showIf:s=>s.mode!=='team'},
+  {key:'bonuses',label:'Bonuses',hint:'Streak and finish bonuses.',opts:[[true,'On'],[false,'Off']],showIf:s=>s.mode!=='team'&&s.scoring==='points'},
+  {key:'autoNext',label:'Automatic next round',hint:'It still waits for a choice when a retry is offered.',opts:[[true,'On'],[false,'Off']]}]},
+ {title:'Comfort',wide:true,items:[
+  {key:'sound',label:'Sound',hint:'Soft chimes only. Never required.',opts:[[true,'On'],[false,'Off']]},
+  {key:'reducedMotion',label:'Reduced motion',hint:'Turns off animations.',opts:[[true,'On'],[false,'Off']]}]}
+];
+function buildSettings(){
+  let h='<div class="levels" id="levels">'+LEVELS.map(function(l,i){
+    return '<button class="level" data-action="level" data-i="'+i+'" aria-pressed="false"><b>Level '+(i+1)+': '+l.name+'</b><span>'+l.detail+'</span></button>';
+  }).join('')+'</div><div class="groups">';
+  SPEC.forEach(function(g){
+    h+='<div class="group'+(g.wide?' wide':'')+'"><h3>'+g.title+'</h3><div class="items">';
+    g.items.forEach(function(it){
+      h+='<div class="setting" data-setting="'+it.key+'"><span class="lab">'+it.label+'</span>'+(it.hint?'<p class="hint">'+it.hint+'</p>':'')+'<div class="seg">'+
+        it.opts.map(o=>'<button data-action="set" data-key="'+it.key+'" data-val=\''+JSON.stringify(o[0])+'\' aria-pressed="false">'+o[1]+'</button>').join('')+'</div></div>';
+    });
+    h+='</div></div>';
+  });
+  $('#settingsBody').innerHTML=h+'</div>';
+}
+function levelMatches(l){return settings.flashMs===l.flashMs&&settings.maxQty===l.maxQty&&(l.pattern===null||settings.pattern===l.pattern);}
+function refreshSettings(){
+  $$('#settingsBody [data-action="set"]').forEach(function(b){
+    b.setAttribute('aria-pressed',String(JSON.parse(b.dataset.val)===settings[b.dataset.key]));
+  });
+  SPEC.forEach(g=>g.items.forEach(function(it){
+    if(it.showIf){const el=$('#settingsBody [data-setting="'+it.key+'"]');if(el)el.hidden=!it.showIf(settings);}
+  }));
+  const matched=LEVELS.findIndex(levelMatches);
+  $$('#levels .level').forEach(function(b,i){b.setAttribute('aria-pressed',String(i===matched));});
+}
+function setSetting(k,v){
+  settings[k]=v;saveSettings();refreshSettings();applyMotion();
+  if(k==='sound'&&v)tone([523,659]);
+}
+
+/* ---------- actions ---------- */
+function handle(action,el){
+  switch(action){
+    case 'start':showScreen('rules');break;
+    case 'demo-start':startDemo();break;
+    case 'skip-demo':case 'demo-finish':startSession();break;
+    case 'demo-another':if(G.phase==='FEEDBACK')nextDemoExample();break;
+    case 'settings':G.returnTo='welcome';showScreen('settings');break;
+    case 'settings-back':showScreen('welcome');break;
+    case 'settings-start':startSession();break;
+    case 'level':{
+      const l=LEVELS[+el.dataset.i];settings.flashMs=l.flashMs;settings.maxQty=l.maxQty;if(l.pattern)settings.pattern=l.pattern;
+      saveSettings();refreshSettings();break;}
+    case 'set':setSetting(el.dataset.key,JSON.parse(el.dataset.val));break;
+    case 'answer':onAnswer(+el.dataset.n);break;
+    case 'tanswer':onTeamAnswer(+el.dataset.team,+el.dataset.n);break;
+    case 'reveal-class':onRevealClass();break;
+    case 'reveal-locked':onRevealLocked();break;
+    case 'next':onNext();break;
+    case 'retry':onRetry();break;
+    case 'replay':onReplay();break;
+    case 'longer':onLonger();break;
+    case 'pause':pause();break;
+    case 'resume':resume();break;
+    case 'restart':if(G.demo&&!G.session)startDemo();else startSession(G.lastOpts);break;
+    case 'home':showScreen('welcome');break;
+    case 'play-again':startSession();break;
+    case 'practise':{
+      let qs=el.dataset.q.split(',').map(Number);
+      if(qs.length===1)qs.push(qs[0]<5?qs[0]+1:qs[0]-1);
+      startSession({quantities:qs});break;}
+    case 'adjust':G.returnTo='results';showScreen('settings');break;
+  }
+}
+document.addEventListener('click',function(e){
+  const b=e.target.closest('[data-action]');if(!b||b.disabled)return;
+  handle(b.dataset.action,b);
+});
+// pointerdown (not click) for the race keypads: faster, and two fingers can tap at once
+document.addEventListener('pointerdown',function(e){
+  const b=e.target.closest('.tkey');if(!b||b.disabled)return;
+  onTeamAnswer(+b.dataset.team,+b.dataset.n);
+});
+document.addEventListener('keydown',function(e){
+  if(G.screen!=='game'||e.ctrlKey||e.metaKey||e.altKey)return;
+  if(e.key==='Escape'){G.paused?resume():pause();return;}
+  if(G.paused)return;
+  if(G.session&&G.session.cfg.mode==='team'){
+    if(!e.repeat&&G.phase==='RECALL'){
+      for(let t=0;t<G.session.players.length;t++){const i=TEAM_KEYS[t].indexOf(e.code);if(i>=0){onTeamAnswer(t,i+1);return;}}
+    }
+  }else if(/^[1-5]$/.test(e.key)&&G.phase==='RECALL'){onAnswer(+e.key);return;}
+  if((e.key==='Enter'||e.key===' ')&&document.activeElement===document.body){
+    if(G.phase==='FEEDBACK'){const nb=$('#nextBtn');if(nb){e.preventDefault();nb.click();}
+      else{const d=$('#actions [data-action="demo-finish"],#actions [data-action="demo-another"]');if(d){e.preventDefault();d.click();}}}
+    else if(G.phase==='LOCKED'){e.preventDefault();onRevealLocked();}
+  }
+});
+document.addEventListener('visibilitychange',function(){if(document.hidden&&G.screen==='game'&&(G.phase==='READY'||G.phase==='FLASHING'))pause();});
+
+/* ---------- init ---------- */
+buildSettings();applyMotion();showScreen('welcome');
+})();
+</script>
+</body>
+</html>
